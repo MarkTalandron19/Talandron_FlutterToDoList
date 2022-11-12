@@ -3,7 +3,7 @@ import 'ToDo.dart';
 import 'ToDoItem.dart';
 
 class ToDoList extends StatefulWidget {
-  ToDoList({super.key});
+  const ToDoList({super.key});
 
   @override
   State<ToDoList> createState() => _ToDoListState();
@@ -12,7 +12,7 @@ class ToDoList extends StatefulWidget {
 class _ToDoListState extends State<ToDoList> {
   final List<ToDo> toDoList = <ToDo>[];
   final itemController = TextEditingController();
-  final editController = TextEditingController();
+  TextEditingController editController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -30,20 +30,35 @@ class _ToDoListState extends State<ToDoList> {
                   children: <Widget>[
                     Column(
                       children: toDoList.map((ToDo todo) {
-                        return Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        return Column(children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
-                              ToDoItem(
-                                todo: todo,
+                              SizedBox(
+                                width: 200,
+                                child: ToDoItem(
+                                  todo: todo,
+                                ),
                               ),
                               Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
+                                  Checkbox(
+                                      value: todo.getFinish(),
+                                      onChanged: ((value) {
+                                        setState(() {
+                                          todo.setFinish();
+                                        });
+                                      })),
+                                  const SizedBox(width: 20),
                                   IconButton(
                                     onPressed: () {
                                       displayEditInput(context, todo);
                                     },
                                     icon: const Icon(
                                       Icons.edit,
+                                      color: Colors.green,
                                     ),
                                   ),
                                   const SizedBox(width: 20),
@@ -55,20 +70,25 @@ class _ToDoListState extends State<ToDoList> {
                                     },
                                     icon: const Icon(
                                       Icons.delete,
+                                      color: Colors.red,
                                     ),
                                   ),
                                 ],
                               ),
-                            ]);
+                            ],
+                          ),
+                          const SizedBox(height: 20),
+                        ]);
                       }).toList(),
-                    )
+                    ),
                   ],
                 ),
-              ),  
+              ),
               Row(
                 children: <Widget>[
                   const SizedBox(width: 335),
                   FloatingActionButton(
+                    backgroundColor: Colors.deepPurple[300],
                     onPressed: (() {
                       displayAddInput(context);
                     }),
@@ -111,6 +131,10 @@ class _ToDoListState extends State<ToDoList> {
             title: const Text("Add new to do item."),
             content: TextField(
               controller: itemController,
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: 'Input here',
+              ),
             ),
             actions: [
               TextButton(
@@ -132,8 +156,11 @@ class _ToDoListState extends State<ToDoList> {
                   onPressed: (() {
                     Navigator.pop(context);
                   }),
-                  child: const Text(
+                  child: Text(
                     "Cancel",
+                    style: TextStyle(
+                      color: Colors.red[200],
+                    ),
                   ))
             ],
           );
@@ -141,6 +168,7 @@ class _ToDoListState extends State<ToDoList> {
   }
 
   Future<void> displayEditInput(BuildContext context, ToDo todo) async {
+    editController.text = todo.getItem();
     return showDialog(
         context: context,
         builder: ((context) {
@@ -148,6 +176,9 @@ class _ToDoListState extends State<ToDoList> {
             title: const Text("Input edit."),
             content: TextField(
               controller: editController,
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+              ),
             ),
             actions: [
               TextButton(
@@ -168,9 +199,10 @@ class _ToDoListState extends State<ToDoList> {
                   onPressed: (() {
                     Navigator.pop(context);
                   }),
-                  child: const Text(
-                    "Cancel",
-                  ))
+                  child: Text("Cancel",
+                      style: TextStyle(
+                        color: Colors.red[200],
+                      )))
             ],
           );
         }));
