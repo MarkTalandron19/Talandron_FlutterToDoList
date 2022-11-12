@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'ToDo.dart';
-import 'ToDoItem.dart';
 
 class ToDoList extends StatefulWidget {
   const ToDoList({super.key});
@@ -23,67 +22,9 @@ class _ToDoListState extends State<ToDoList> {
         ),
         body: Center(
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            mainAxisAlignment: MainAxisAlignment.end,
             children: <Widget>[
-              Expanded(
-                child: ListView(
-                  children: <Widget>[
-                    Column(
-                      children: toDoList.map((ToDo todo) {
-                        return Column(children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              SizedBox(
-                                width: 200,
-                                child: ToDoItem(
-                                  todo: todo,
-                                ),
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Checkbox(
-                                      value: todo.getFinish(),
-                                      onChanged: ((value) {
-                                        setState(() {
-                                          todo.setFinish();
-                                        });
-                                      })),
-                                  const SizedBox(width: 20),
-                                  IconButton(
-                                    onPressed: () {
-                                      displayEditInput(context, todo);
-                                    },
-                                    icon: const Icon(
-                                      Icons.edit,
-                                      color: Colors.green,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 20),
-                                  IconButton(
-                                    onPressed: () {
-                                      setState(() {
-                                        toDoList.remove(todo);
-                                      });
-                                    },
-                                    icon: const Icon(
-                                      Icons.delete,
-                                      color: Colors.red,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 20),
-                        ]);
-                      }).toList(),
-                    ),
-                  ],
-                ),
-              ),
+              toDoList.isEmpty ? displayEmpty(context) : displayList(context),
               Row(
                 children: <Widget>[
                   const SizedBox(width: 335),
@@ -104,13 +45,109 @@ class _ToDoListState extends State<ToDoList> {
         ));
   }
 
+  Widget displayEmpty(BuildContext context) {
+    return Column(
+      children: const [
+        Icon(
+          Icons.emoji_emotions,
+          color: Colors.yellow,
+          size: 300,
+        ),
+        SizedBox(height: 20),
+        Text("You have nothing to do!",
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 30,
+              color: Colors.amber,
+            )),
+        SizedBox(height: 60),
+      ],
+    );
+  }
+
+  Widget displayList(BuildContext context) {
+    return Expanded(
+      child: ListView(
+        children: <Widget>[
+          Column(
+            children: toDoList.map((ToDo todo) {
+              return Column(children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    SizedBox(
+                      width: 200,
+                      child: Text(
+                        todo.getItem(),
+                        style: const TextStyle(
+                          fontSize: 20,
+                          color: Color.fromARGB(255, 134, 193, 242),
+                        ),
+                      ),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Checkbox(
+                            value: todo.getFinish(),
+                            onChanged: ((value) {
+                              setState(() {
+                                todo.setFinish();
+                              });
+                            })),
+                        const SizedBox(width: 20),
+                        IconButton(
+                          onPressed: () {
+                            displayEditInput(context, todo);
+                          },
+                          icon: const Icon(
+                            Icons.edit,
+                            color: Colors.green,
+                          ),
+                        ),
+                        const SizedBox(width: 20),
+                        IconButton(
+                          onPressed: () {
+                            setState(() {
+                              toDoList.remove(todo);
+                            });
+                          },
+                          icon: const Icon(
+                            Icons.delete,
+                            color: Colors.red,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+              ]);
+            }).toList(),
+          ),
+        ],
+      ),
+    );
+  }
+
   Future<void> displayEmptyError(BuildContext context) async {
     return showDialog(
         context: context,
         builder: ((context) {
           return AlertDialog(
-            title: const Text("Error"),
-            content: const Text("Textfield is empty."),
+            title: const Text(
+              "Error",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 25,
+                color: Colors.red,
+              ),
+            ),
+            content: const Text("Textfield is empty.",
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                )),
             actions: [
               TextButton(
                 onPressed: () {
@@ -128,7 +165,16 @@ class _ToDoListState extends State<ToDoList> {
         context: context,
         builder: ((context) {
           return AlertDialog(
-            title: const Text("Add new to do item."),
+            shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(10.0))),
+            title: const Text(
+              "Add new to do item.",
+              style: TextStyle(
+                fontSize: 25,
+                fontWeight: FontWeight.bold,
+                color: Colors.deepPurple,
+              ),
+            ),
             content: TextField(
               controller: itemController,
               decoration: const InputDecoration(
@@ -173,7 +219,14 @@ class _ToDoListState extends State<ToDoList> {
         context: context,
         builder: ((context) {
           return AlertDialog(
-            title: const Text("Input edit."),
+            title: const Text(
+              "Input edit",
+              style: TextStyle(
+                fontSize: 25,
+                fontWeight: FontWeight.bold,
+                color: Colors.deepPurple,
+              ),
+            ),
             content: TextField(
               controller: editController,
               decoration: const InputDecoration(
