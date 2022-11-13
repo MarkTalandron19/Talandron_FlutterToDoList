@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'ToDo.dart';
 
 class ToDoList extends StatefulWidget {
-  const ToDoList({super.key});
+  const ToDoList({super.key, required this.toDoList});
+  final List<ToDo> toDoList;
 
   @override
   State<ToDoList> createState() => _ToDoListState();
 }
 
 class _ToDoListState extends State<ToDoList> {
-  final List<ToDo> toDoList = <ToDo>[];
   final itemController = TextEditingController();
   TextEditingController editController = TextEditingController();
 
@@ -19,15 +19,23 @@ class _ToDoListState extends State<ToDoList> {
         appBar: AppBar(
           title: const Text('To Do List'),
           centerTitle: true,
+          leading: BackButton(
+            onPressed: (() {
+              Navigator.pop(context, widget.toDoList);
+            }),
+          ),
         ),
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.end,
             children: <Widget>[
-              toDoList.isEmpty ? displayEmpty(context) : displayList(context),
+              widget.toDoList.isEmpty
+                  ? displayEmpty(context)
+                  : displayList(context),
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
-                  const SizedBox(width: 335),
+                  const SizedBox(width: 0),
                   FloatingActionButton(
                     backgroundColor: Colors.deepPurple[300],
                     onPressed: (() {
@@ -46,8 +54,10 @@ class _ToDoListState extends State<ToDoList> {
   }
 
   Widget displayEmpty(BuildContext context) {
-    return Column(
+    return Expanded(
+      child: Column(
       children: const [
+        SizedBox(height: 150),
         Icon(
           Icons.emoji_emotions,
           color: Colors.yellow,
@@ -62,7 +72,7 @@ class _ToDoListState extends State<ToDoList> {
             )),
         SizedBox(height: 60),
       ],
-    );
+    ));
   }
 
   Widget displayList(BuildContext context) {
@@ -70,7 +80,7 @@ class _ToDoListState extends State<ToDoList> {
       child: ListView(
         children: <Widget>[
           Column(
-            children: toDoList.map((ToDo todo) {
+            children: widget.toDoList.map((ToDo todo) {
               return Column(children: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -109,7 +119,7 @@ class _ToDoListState extends State<ToDoList> {
                         IconButton(
                           onPressed: () {
                             setState(() {
-                              toDoList.remove(todo);
+                              widget.toDoList.remove(todo);
                             });
                           },
                           icon: const Icon(
@@ -187,7 +197,7 @@ class _ToDoListState extends State<ToDoList> {
                   onPressed: (() {
                     if (itemController.text.isNotEmpty) {
                       setState(() {
-                        toDoList.add(
+                        widget.toDoList.add(
                             ToDo(item: itemController.text, finish: false));
                         itemController.clear();
                       });
@@ -238,7 +248,7 @@ class _ToDoListState extends State<ToDoList> {
                   onPressed: (() {
                     if (editController.text.isNotEmpty) {
                       setState(() {
-                        toDoList[toDoList.indexOf(todo)] =
+                        widget.toDoList[widget.toDoList.indexOf(todo)] =
                             ToDo(item: editController.text, finish: false);
                       });
                       editController.clear();
